@@ -11,12 +11,9 @@ function InputContactForm() {
                 Masukkan Contact
             </h1>
             <FormGroup>
-                <InputLabel css={styles.input}>Nama Depan: </InputLabel>
-                <TextField  css={styles.input}/>
-                <InputLabel css={styles.input}>Nama Belakang: </InputLabel>
-                <TextField  css={styles.input}/>
-                <InputLabel css={styles.input}>Nomor Telepon: </InputLabel>
-                <TextField type='number'  css={styles.input}/>
+                <TextField label="Nama Depan" variant="outlined" css={styles.input}/>
+                <TextField label="Nama Belakang" variant="outlined" css={styles.input}/>
+                <TextField label="Nomor Telepon" variant="outlined" type='number'  css={styles.input}/>
                 <Button variant="outlined" css={styles.button}>Tambah Nomor Telepon</Button>
                 <Button variant="contained" css={styles.button}>Masukkan Kontak</Button>
             </FormGroup>
