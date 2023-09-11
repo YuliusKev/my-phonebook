@@ -10,5 +10,5 @@ export const input = css`
 `
 
 export const button = css`
-  margin: 15px;
+  margin: 5px;
 `
