@@ -13,7 +13,7 @@ function ShowLists() {
     }, [data])
     
     return <div>{list.map((thedata) => {
-        return <h1 key={thedata.id}>{`${thedata.first_name} ${thedata.last_name}`}</h1>
+        return <h1 key={thedata.id}>{`${thedata.first_name} ${thedata.last_name} - ${thedata.phones[0].number}`}</h1>
     })} </div>
   }
   
