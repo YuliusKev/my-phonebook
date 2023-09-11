@@ -10,6 +10,7 @@ import {
 } from '@apollo/client'
 import {onError} from '@apollo/client/link/error'
 import ShowLists from "./Components/GetContactLists" 
+import InputContactForm from './Components/InputContact/InputContact';
 
 const errorLink = onError(({ graphQLErrors,networkError }) => {
   if(graphQLErrors){
@@ -30,7 +31,7 @@ const client = new ApolloClient({
 
 function App() {
   return <ApolloProvider client={client}> 
-    <ShowLists></ShowLists> 
+    <InputContactForm></InputContactForm> 
   </ApolloProvider>
 }
 
