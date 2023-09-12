@@ -7,9 +7,9 @@ import  { ADD_CONTACT_MUTATIONS } from '../../GraphQL/Mutations.tsx'
 
   
 function InputContactForm() {
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [phone, setPhone] = useState(Number);
+    const [firstName, setFirstName] = useState<String>("");
+    const [lastName, setLastName] = useState<String>('');
+    const [phone, setPhone] = useState<string>();
 
     const [AddContactWithPhones, { error }] = useMutation(ADD_CONTACT_MUTATIONS)
 
@@ -38,7 +38,7 @@ function InputContactForm() {
             <FormGroup>
                 <TextField label="Nama Depan" variant="outlined" onChange={e => setFirstName(e.target.value)} css={styles.input}/>
                 <TextField label="Nama Belakang" variant="outlined" onChange={e => setLastName(e.target.value)} css={styles.input}/>
-                <TextField label="Nomor Telepon" variant="outlined" type='number' onChange={e => setPhone(Number(e.target.value))} css={styles.input}/>
+                <TextField inputProps={{ type: "number"} }label="Nomor Telepon" variant="outlined" onChange={e =>  setPhone(e?.target?.value)} css={styles.input}/>
                 <Button variant="outlined" css={styles.button}>Tambah Nomor Telepon</Button>
                 <Button variant="contained" onClick={() => addContact()} css={styles.button}>Masukkan Kontak</Button>
             </FormGroup>
