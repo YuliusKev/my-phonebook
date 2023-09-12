@@ -11,6 +11,23 @@ import {
 import {onError} from '@apollo/client/link/error'
 import ShowLists from "./Components/GetContactLists" 
 import InputContactForm from './Components/InputContact/InputContact';
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <ShowLists />,
+  },
+  {
+    path: "/input-contact",
+    element: <InputContactForm />,
+  },
+]);
+
 
 const errorLink = onError(({ graphQLErrors,networkError }) => {
   if(graphQLErrors){
@@ -31,7 +48,7 @@ const client = new ApolloClient({
 
 function App() {
   return <ApolloProvider client={client}> 
-    <InputContactForm></InputContactForm> 
+     <RouterProvider router={router} />
   </ApolloProvider>
 }
 
