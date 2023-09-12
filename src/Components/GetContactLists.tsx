@@ -18,7 +18,7 @@ function ShowLists() {
         <ContactHeader />
         {list.map((thedata) => {
         return <>
-            <h1 key={thedata.id}>{`${thedata.first_name} ${thedata.last_name} - ${thedata.phones[0].number}`}</h1>
+            <h1 key={thedata.id}>{`${thedata.first_name} ${thedata.last_name}`}</h1>
         </>
     })} </div>
   }
