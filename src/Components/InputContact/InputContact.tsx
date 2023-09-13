@@ -1,10 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import { Button, FormGroup, TextField } from '@mui/material';
 import React, {useEffect, useState} from 'react';
+import ContactHeader from "../ContactHeader"
 import * as styles from  "./InputContact.style.ts"
 import { useMutation } from '@apollo/client';
 import  { ADD_CONTACT_MUTATIONS } from '../../GraphQL/Mutations.tsx'
-
+import { Container } from '@mui/material';
   
 function InputContactForm() {
     const [firstName, setFirstName] = useState<string>("");
@@ -48,10 +49,8 @@ function InputContactForm() {
     }
 
     return (
-        <div>
-            <h1 css={styles.title}>
-                Masukkan Contact
-            </h1>
+        <>
+           <ContactHeader />
             <FormGroup>
                 <TextField label="Nama Depan" variant="outlined" value={firstName} onChange={e => setFirstName(e.target.value)} css={styles.input}/>
                 <TextField label="Nama Belakang" variant="outlined" value={lastName} onChange={e => setLastName(e.target.value)} css={styles.input}/>
@@ -69,7 +68,7 @@ function InputContactForm() {
                 <Button variant="outlined" css={styles.button} onClick={() => addPhone()}>Tambah Nomor Telepon</Button>
                 <Button variant="contained" onClick={() => addContact()} css={styles.button}>Masukkan Kontak</Button>
             </FormGroup>
-        </div>
+        </>
     );
 }
 
