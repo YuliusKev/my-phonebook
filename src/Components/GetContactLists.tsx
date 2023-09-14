@@ -72,7 +72,9 @@ function ShowLists() {
     }, [data])
 
     async function testFetchMore ( test: number) {
-        const push = await fetchMore({ variables: { offset: test}})
+        const push = await fetchMore({ variables: { offset: 10}})
+        console.log(test)
+
         if(push){
             setList((prevData) => {
                 const newData = [...prevData, ...push.data.contact];
@@ -81,18 +83,16 @@ function ShowLists() {
         }
     }
     const setStorage = (data : object) => {
-        
         setFavouriteList([data]);
     }
     return (
-        <Box>
+        <Box height="100vh" sx={{bgcolor: '#1e1e1e'}}>
             <Box sx={{ padding:2 }}>
                 <TextField label="Search Contact" value={search || ""} variant="outlined" sx={{ width:"100%", height: 10,  borderColor: "grey", input: { color: 'white' }, Label: { color: '#c0c0c0'}}} onChange={(e) => searchValue(e.target.value)}/>
             </Box>
             <Grid sx={{ marginTop:2 }}>
                 <List>
                     {favouriteList?.map( (fav) => {
-                        console.log(fav);
                         return (
                             <React.Fragment key={fav['id']}>
                                 <ListItem>
@@ -113,7 +113,7 @@ function ShowLists() {
                 </List>
             </Grid>
             <Grid>
-                <InfiniteScroll dataLength={list.length} next={() => testFetchMore(list.length  || 0)} hasMore={true} loader={""}>
+                <InfiniteScroll dataLength={list.length} next={() => testFetchMore(list.length)} hasMore={true} loader={""}>
                     <List>
                         {list.map((thedata) => {
                             return (
