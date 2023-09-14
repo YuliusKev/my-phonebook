@@ -16,9 +16,9 @@ import { useLocalStorageState } from 'ahooks';
 
 function ShowLists() {
     const defaultFavourite = [
-        {
-        },
+        {},
     ]
+    const excludeDefaultArray = [0];
     const [search, setSearch] = useState<string>("");
     const [list, setList] = useState(Array());
     const [missing, setMissing] = useState<boolean>(false)
@@ -27,9 +27,18 @@ function ShowLists() {
             defaultValue: defaultFavourite
         },
     )
+    const [excludeData, setExcludeData] = useLocalStorageState(
+        'use-local-storage-state-demo2', {
+            defaultValue: excludeDefaultArray
+        },
+    )
+    
     const firstFetch = {
         limit: 10,
-        offset: 0
+        offset: 0,
+        where:{
+            _and: {id : {_nin : excludeData}}
+        }
     }
 
     const {error, loading, data, refetch, fetchMore} = useQuery(LOAD_CONTACT_LISTS, {
@@ -83,7 +92,9 @@ function ShowLists() {
         }
     }
     const setStorage = (data : object) => {
-        setFavouriteList([data]);
+        setFavouriteList([...favouriteList, data]);
+        setExcludeData([...excludeData, data['id']])
+
     }
     return (
         <Box height="100vh" sx={{bgcolor: '#1e1e1e'}}>
