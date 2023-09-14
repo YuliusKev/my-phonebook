@@ -4,14 +4,16 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from "react-router-dom";
-
+import { Box } from '@mui/material';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
      <BrowserRouter>
-          <App />
+          <Box height="100vh" sx={{ bgcolor: "#1e1e1e"}}>
+            <App />
+          </Box>
      </BrowserRouter>
   </React.StrictMode>
 );
