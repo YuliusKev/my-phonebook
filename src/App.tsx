@@ -11,6 +11,7 @@ import {
 import {onError} from '@apollo/client/link/error'
 import ShowLists from "./Components/GetContactLists" 
 import InputContactForm from './Components/InputContact/InputContact';
+import ContactHeader from './Components/ContactHeader';
 import {
   Routes, Route
 } from "react-router-dom";
@@ -35,6 +36,7 @@ const client = new ApolloClient({
 function App() {
   return (
     <ApolloProvider client={client}> 
+      <ContactHeader />
       <Routes>
         <Route path="/" element={<ShowLists />} />
         <Route path="/input-contact" element={<InputContactForm />} />

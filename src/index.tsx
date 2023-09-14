@@ -4,7 +4,6 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from "react-router-dom";
-import { Box } from '@mui/material';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -12,9 +11,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
      <BrowserRouter>
-        <Box sx={{ bgcolor: '#1e1e1e', height: "100%", width:"100%"}}>
           <App />
-        </Box>
      </BrowserRouter>
   </React.StrictMode>
 );

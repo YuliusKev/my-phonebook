@@ -50,7 +50,6 @@ function InputContactForm() {
 
     return (
         <>
-           <ContactHeader />
             <FormGroup>
                 <TextField label="Nama Depan" variant="outlined" value={firstName} onChange={e => setFirstName(e.target.value)} css={styles.input}/>
                 <TextField label="Nama Belakang" variant="outlined" value={lastName} onChange={e => setLastName(e.target.value)} css={styles.input}/>
