@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { Button, FormGroup, TextField } from '@mui/material';
 import React, {useEffect, useState} from 'react';
-import * as styles from  "./InputContact/InputContact.style.ts"
 import { useMutation, useQuery } from '@apollo/client';
 import {LOAD_CONTACT_LISTS} from "../GraphQL/Queries.tsx"
 import  { ADD_CONTACT_MUTATIONS } from '../GraphQL/Mutations.tsx'
@@ -64,7 +63,7 @@ function InputContactForm() {
                     onChange={e => setFirstName(e.target.value)} 
                     sx={{ margin: "5px"}}
                 />
-                <TextField label="Nama Belakang" variant="outlined" value={lastName} onChange={e => setLastName(e.target.value)} css={styles.input}/>
+                <TextField label="Nama Belakang" variant="outlined" value={lastName} onChange={e => setLastName(e.target.value)}  sx={{ margin: "5px"}}/>
                 {listPhone.map((value, index) => {
                     return <TextField
                                 key={index}
@@ -77,7 +76,7 @@ function InputContactForm() {
                             />
                 })}
                 <Button variant="outlined" sx={{ margin: "5px"}} onClick={() => addPhone()}>Tambah Nomor Telepon</Button>
-                <Button variant="contained" sx={{ margin: "5px"}} onClick={() => addContact()} css={styles.button}>Masukkan Kontak</Button>
+                <Button variant="contained" sx={{ margin: "5px"}} onClick={() => addContact()}>Masukkan Kontak</Button>
             </FormGroup>
         </Grid>
     );
