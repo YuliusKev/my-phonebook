@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useQuery, gql, useMutation}from '@apollo/client'
+import {useQuery, gql, useMutation }from '@apollo/client'
 import {LOAD_CONTACT_LISTS} from "../GraphQL/Queries"
 import  { DELETE_CONTACT } from '../GraphQL/Mutations.tsx'
 import List from '@mui/material/List';
@@ -13,24 +13,49 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import StarIcon from '@mui/icons-material/Star';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useLocalStorageState } from 'ahooks';
+import { type } from 'os';
 
 function ShowLists() {
-    const defaultFavourite = [
-        {},
-    ]
-    const excludeDefaultArray = [0];
+    window.onbeforeunload = function () {
+        window.scrollTo(0, 0);
+      }
+    interface phoneType {
+        number : string,
+    }
+    interface contactType {
+            created_at: string,
+            first_name: string,
+            id: number, 
+            last_name: string,
+            phones: phoneType[]
+     }
+
+    const defaultFavourite : contactType[] = [
+        {
+            created_at: "",
+            first_name: "",
+            id: 0, 
+            last_name: "",
+            phones: [
+                {
+                    number: "",
+                }
+             
+            ]
+        }
+    ];
     const [search, setSearch] = useState<string>("");
     const [list, setList] = useState(Array());
     const [missing, setMissing] = useState<boolean>(false)
     const [favouriteList, setFavouriteList] = useLocalStorageState(
         'use-local-storage-state-demo1', {
-            defaultValue: defaultFavourite
+            defaultValue: defaultFavourite 
         },
     )
-    const [excludeData, setExcludeData] = useLocalStorageState(
-        'use-local-storage-state-demo2', {
-            defaultValue: excludeDefaultArray
-        },
+    const [excludeData, setExcludeData] = useLocalStorageState<number[] | undefined>(
+        'exclude-list', {
+            defaultValue: [0]
+        }
     )
     
     const firstFetch = {
@@ -47,6 +72,18 @@ function ShowLists() {
 
     const [deleteContactData, { error: deleteError }] =  useMutation(DELETE_CONTACT);
 
+    useEffect(() => {
+        if(data){
+            setList(data.contact)
+        }
+    }, [data])
+
+
+    const refetchList = async () => {
+        const listData = refetch();
+        setList((await listData).data.contact)
+    } 
+
     const deleteContact = async (id : number) => {
         await deleteContactData({
             variables: {
@@ -57,75 +94,104 @@ function ShowLists() {
         if(deleteError) {
             return <h1>ERROR</h1>
         } else {
-            const listData = refetch();
-            setList((await listData).data.contact)
+           refetchList()
         }
     }
     
     const searchValue = (value: string) => {
         setSearch(value);
-        if(search){
-            setMissing(true);
-            refetch({ where : {first_name: {_ilike: `%${value}%` } }})
-            console.log(missing)
-        } else {
+        refetch({ where : {first_name: {_ilike: `%${value}%` } }})
+        if(value == ""){
             setMissing(false);
+        } else {
+            setMissing(true);
         }
     }
 
-    useEffect(() => {
-        if(data){
-            setList(data.contact)
-
-        }
-    }, [data])
-
-    async function testFetchMore ( test: number) {
-        const push = await fetchMore({ variables: { offset: 10}})
-        console.log(test)
-
-        if(push){
-            setList((prevData) => {
-                const newData = [...prevData, ...push.data.contact];
-                return newData
-            })
-        }
+    function testFetchMore () {
+        fetchMore({ 
+            variables: { limit:data.contact.length + 10,  offset: data.contact.length},
+            updateQuery: (prev, { fetchMoreResult }) => {
+                console.log(fetchMoreResult)
+               if(!fetchMoreResult) {return prev};
+               return {
+                    contact: [...prev.contact, ...fetchMoreResult.contact || 0],
+               }
+            }
+        })
+        // console.log(list)
+        // console.log(pull)
+        // if(push){
+        //     setList((prevData) => {
+        //         const newData = [...prevData, ...push.contact];
+        //         return newData
+        //     })
+        // }
     }
-    const setStorage = (data : object) => {
-        setFavouriteList([...favouriteList, data]);
-        setExcludeData([...excludeData, data['id']])
+    
 
+    async function setStorage (data : contactType) {
+        if(excludeData && favouriteList){
+            if(excludeData.includes(data.id)){
+                const index = excludeData.indexOf(data.id);
+                const index2 = favouriteList.indexOf(data);
+
+                if(excludeData.length == 1)
+                {
+                    setExcludeData([0]);
+                    setFavouriteList(defaultFavourite);
+                }else {
+                    setExcludeData(excludeData.filter((newData) => {return newData !== data.id}));
+                    setFavouriteList(favouriteList.filter((newData) => {return newData !== data}))
+                }
+            } else {
+                setExcludeData([...excludeData, data.id])
+                setFavouriteList([...favouriteList, data]);
+
+            }
+        }
     }
     return (
-        <Box height="100vh" sx={{bgcolor: '#1e1e1e'}}>
+        <Grid sx={{height: "100vh", bgcolor: '#1e1e1e'}}>
             <Box sx={{ padding:2 }}>
-                <TextField label="Search Contact" value={search || ""} variant="outlined" sx={{ width:"100%", height: 10,  borderColor: "grey", input: { color: 'white' }, Label: { color: '#c0c0c0'}}} onChange={(e) => searchValue(e.target.value)}/>
+                <TextField label="Search Contact" value={search || ""} variant="outlined" sx={{ width:"100%",  borderColor: "grey", input: { color: 'white' }, Label: { color: '#c0c0c0'}}} onChange={(e) => searchValue(e.target.value)}/>
             </Box>
-            <Grid sx={{ marginTop:2 }}>
-                <List>
-                    {favouriteList?.map( (fav) => {
-                        return (
-                            <React.Fragment key={fav['id']}>
-                                <ListItem>
-                                    <ListItemAvatar>
-                                        <Avatar sx={{bgcolor: "aqua"}}>
-                                            <PersonOutlineIcon sx={{color: 'white'}}/>
-                                        </Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        primary={`${fav['first_name']} ${fav['last_name']}`}
-                                        sx={{ color: 'white'}}
-                                    >
-                                    </ListItemText>
-                                </ListItem>
-                            </React.Fragment>
-                        )
+            <Grid sx={{ marginTop:2, display: (missing) ? "none" : "block" }}>
+                <List sx={{bgcolor: '#1e1e1e'}}>
+                    {favouriteList?.map( (favItem) => {
+                        if(favItem.id !== 0 ){
+                            return (
+                                <React.Fragment key={favItem.id}>
+                                    <ListItem>
+                                        <ListItemAvatar>
+                                            <Avatar sx={{bgcolor: "aqua"}}>
+                                                <PersonOutlineIcon sx={{color: 'white'}}/>
+                                            </Avatar>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={`${favItem.first_name} ${favItem.last_name} - ${favItem?.phones[0]?.number}`}
+                                            sx={{ color: 'white'}}
+                                        >
+                                        </ListItemText>
+                                        <ListItemIcon sx={{justifyContent: 'right'}}>
+                                            <IconButton onClick={() => setStorage(favItem)}>
+                                                <StarIcon sx={{ color: "yellow"}}/>
+                                            </IconButton> 
+                                            <IconButton onClick={() => deleteContact(favItem.id)}>
+                                                <DeleteIcon sx={{ color: "white"}}/>
+                                            </IconButton> 
+                                        </ListItemIcon>
+                                    </ListItem>
+                                </React.Fragment>
+                            )
+                        }
                     })}
                 </List>
             </Grid>
-            <Grid>
-                <InfiniteScroll dataLength={list.length} next={() => testFetchMore(list.length)} hasMore={true} loader={""}>
-                    <List>
+            <Divider sx={{ bgcolor: "white"}}/>
+            <Grid sx={{bgcolor: '#1e1e1e'}}>
+                <InfiniteScroll dataLength={list.length} next={() => testFetchMore()} hasMore={true} loader={""}> 
+                    <List sx={{bgcolor: '#1e1e1e'}}>
                         {list.map((thedata) => {
                             return (
                                 <React.Fragment key={thedata.id}>
@@ -158,7 +224,7 @@ function ShowLists() {
                     </List>
                 </InfiniteScroll>
             </Grid>
-        </Box>
+        </Grid>
     )
   }
   
