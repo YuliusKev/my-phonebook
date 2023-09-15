@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useQuery, gql, useMutation }from '@apollo/client'
+import {useQuery, useMutation }from '@apollo/client'
 import {LOAD_CONTACT_LISTS} from "../GraphQL/Queries"
 import  { DELETE_CONTACT } from '../GraphQL/Mutations.tsx'
 import List from '@mui/material/List';
@@ -13,47 +13,47 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import StarIcon from '@mui/icons-material/Star';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useLocalStorageState } from 'ahooks';
-import { type } from 'os';
 
 function ShowLists() {
     window.onbeforeunload = function () {
         window.scrollTo(0, 0);
       }
-    interface phoneType {
+    interface PhoneType {
         number : string,
     }
-    interface contactType {
+    interface ContactType {
             created_at: string,
             first_name: string,
             id: number, 
             last_name: string,
-            phones: phoneType[]
+            phones: PhoneType[]
      }
 
-    const defaultFavourite : contactType[] = [
+    const defaultFavourite : ContactType[] = [
         {
             created_at: "",
             first_name: "",
             id: 0, 
             last_name: "",
-            phones: [
-                {
-                    number: "",
-                }
-             
-            ]
+            phones: [{number: ""}]
         }
     ];
     const [search, setSearch] = useState<string>("");
     const [list, setList] = useState(Array());
     const [missing, setMissing] = useState<boolean>(false)
     const [favouriteList, setFavouriteList] = useLocalStorageState(
-        'use-local-storage-state-demo1', {
-            defaultValue: defaultFavourite 
+        'favourite-list', {
+            defaultValue: [{
+                    created_at: "",
+                    first_name: "",
+                    id: 0, 
+                    last_name: "",
+                    phones: [{number: ""}]
+                }] 
         },
     )
-    const [excludeData, setExcludeData] = useLocalStorageState<number[] | undefined>(
-        'exclude-list', {
+    const [favouriteId, setFavouriteId] = useLocalStorageState<number[] | undefined>(
+        'favourite-id', {
             defaultValue: [0]
         }
     )
@@ -62,7 +62,7 @@ function ShowLists() {
         limit: 10,
         offset: 0,
         where:{
-            _and: {id : {_nin : excludeData}}
+            _and: {id : {_nin : favouriteId}}
         }
     }
 
@@ -70,21 +70,20 @@ function ShowLists() {
         variables: firstFetch
     });
 
-    const [deleteContactData, { error: deleteError }] =  useMutation(DELETE_CONTACT);
-
     useEffect(() => {
         if(data){
             setList(data.contact)
         }
     }, [data])
 
+    const [deleteContactData, { error: deleteError }] =  useMutation(DELETE_CONTACT);    
 
     const refetchList = async () => {
         const listData = refetch();
         setList((await listData).data.contact)
     } 
 
-    const deleteContact = async (id : number) => {
+    const onClickdelete = async (id : number) => {
         await deleteContactData({
             variables: {
                 "id": id,
@@ -108,7 +107,7 @@ function ShowLists() {
         }
     }
 
-    function testFetchMore () {
+    function onBottomPage () {
         fetchMore({ 
             variables: { limit:data.contact.length + 10,  offset: data.contact.length},
             updateQuery: (prev, { fetchMoreResult }) => {
@@ -119,33 +118,21 @@ function ShowLists() {
                }
             }
         })
-        // console.log(list)
-        // console.log(pull)
-        // if(push){
-        //     setList((prevData) => {
-        //         const newData = [...prevData, ...push.contact];
-        //         return newData
-        //     })
-        // }
     }
-    
 
-    async function setStorage (data : contactType) {
-        if(excludeData && favouriteList){
-            if(excludeData.includes(data.id)){
-                const index = excludeData.indexOf(data.id);
-                const index2 = favouriteList.indexOf(data);
-
-                if(excludeData.length == 1)
+    async function onClickFavourite (data : ContactType) {
+        if(favouriteId && favouriteList){
+            if(favouriteId.includes(data.id)){
+                if(favouriteId.length == 1)
                 {
-                    setExcludeData([0]);
+                    setFavouriteId([0]);
                     setFavouriteList(defaultFavourite);
                 }else {
-                    setExcludeData(excludeData.filter((newData) => {return newData !== data.id}));
+                    setFavouriteId(favouriteId.filter((newData) => {return newData !== data.id}));
                     setFavouriteList(favouriteList.filter((newData) => {return newData !== data}))
                 }
             } else {
-                setExcludeData([...excludeData, data.id])
+                setFavouriteId([...favouriteId, data.id])
                 setFavouriteList([...favouriteList, data]);
 
             }
@@ -174,11 +161,8 @@ function ShowLists() {
                                         >
                                         </ListItemText>
                                         <ListItemIcon sx={{justifyContent: 'right'}}>
-                                            <IconButton onClick={() => setStorage(favItem)}>
+                                            <IconButton onClick={() => onClickFavourite(favItem)}>
                                                 <StarIcon sx={{ color: "yellow"}}/>
-                                            </IconButton> 
-                                            <IconButton onClick={() => deleteContact(favItem.id)}>
-                                                <DeleteIcon sx={{ color: "white"}}/>
                                             </IconButton> 
                                         </ListItemIcon>
                                     </ListItem>
@@ -190,7 +174,7 @@ function ShowLists() {
             </Grid>
             <Divider sx={{ bgcolor: "white"}}/>
             <Grid sx={{bgcolor: '#1e1e1e'}}>
-                <InfiniteScroll dataLength={list.length} next={() => testFetchMore()} hasMore={true} loader={""}> 
+                <InfiniteScroll dataLength={list.length} next={() => onBottomPage()} hasMore={true} loader={""}> 
                     <List sx={{bgcolor: '#1e1e1e'}}>
                         {list.map((thedata) => {
                             return (
@@ -209,10 +193,10 @@ function ShowLists() {
                                             </ListItemText>
                                         </ListItemButton>
                                         <ListItemIcon sx={{justifyContent: 'right'}}>
-                                            <IconButton onClick={() => setStorage(thedata)}>
-                                                <StarIcon sx={{ color: "white"}}/>
+                                            <IconButton onClick={() => onClickFavourite(thedata)}>
+                                                <StarIcon sx={{ color: (favouriteId?.includes(thedata.id )) ? 'yellow' : "white"}}/>
                                             </IconButton> 
-                                            <IconButton onClick={() => deleteContact(thedata.id)}>
+                                            <IconButton onClick={() => onClickdelete(thedata.id)}>
                                                 <DeleteIcon sx={{ color: "white"}}/>
                                             </IconButton> 
                                         </ListItemIcon>

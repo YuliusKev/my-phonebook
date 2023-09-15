@@ -10,7 +10,7 @@ import {
 } from '@apollo/client'
 import {onError} from '@apollo/client/link/error'
 import ShowLists from "./Components/GetContactLists" 
-import InputContactForm from './Components/InputContact/InputContact';
+import InputContactForm from './Components/InputContact';
 import ContactHeader from './Components/ContactHeader';
 import {
   Routes, Route
