@@ -14,11 +14,19 @@ function InputContactForm() {
     );
     const [nameError, setNameError] = useState<boolean>(false)
 
-
     const {error : errorFetching, loading, data, refetch, fetchMore} = useQuery(LOAD_CONTACT_LISTS);
 
     const [phoneCounter, setPhoneCounter] = useState<number>(1);
     
+    const checkNameCharacters = (value : string, type: string) => {
+        const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+        if(!specialChars.test(value)){
+            (type == 'first_name') ? setFirstName(value) : setLastName(value)
+        } else {
+            console.log("gagal")
+        }
+    }   
+
     const [AddContactWithPhones, { error: errorSubmit }] = useMutation(ADD_CONTACT_MUTATIONS)
     const addContact = () => {
         if(firstName === lastName){
@@ -60,10 +68,15 @@ function InputContactForm() {
                     label="Nama Depan" 
                     variant="outlined" 
                     value={firstName} 
-                    onChange={e => setFirstName(e.target.value)} 
+                    onChange={e => checkNameCharacters(e.target.value, 'first_name')} 
                     sx={{ margin: "5px"}}
                 />
-                <TextField label="Nama Belakang" variant="outlined" value={lastName} onChange={e => setLastName(e.target.value)}  sx={{ margin: "5px"}}/>
+                <TextField 
+                    label="Nama Belakang" 
+                    variant="outlined" 
+                    value={lastName} 
+                    onChange={e => checkNameCharacters(e.target.value, 'last_name')} 
+                    sx={{ margin: "5px"}}/>
                 {listPhone.map((value, index) => {
                     return <TextField
                                 key={index}
