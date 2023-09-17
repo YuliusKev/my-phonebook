@@ -61,7 +61,6 @@ function ShowLists() {
     LOAD_CONTACT_LISTS,
     {
       variables: firstFetch,
-      fetchPolicy: 'cache-and-network',
     }
   );
 
