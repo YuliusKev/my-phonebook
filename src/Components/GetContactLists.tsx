@@ -12,12 +12,9 @@ import {
   Box,
   Divider,
   Grid,
-  ListItemButton,
   TextField,
   ListItemIcon,
   IconButton,
-  Card,
-  CardContent,
   Typography,
   Link,
 } from "@mui/material";
@@ -60,7 +57,7 @@ function ShowLists() {
     },
   };
 
-  const { error, loading, data, refetch, fetchMore } = useQuery(
+  const { data, refetch, fetchMore } = useQuery(
     LOAD_CONTACT_LISTS,
     {
       variables: firstFetch,
@@ -120,7 +117,7 @@ function ShowLists() {
   const searchValue = (value: string) => {
     setSearch(value);
     refetch({ where: { first_name: { _ilike: `%${value}%` } } });
-    if (value == "") {
+    if (value === "") {
       setMissing(false);
     } else {
       setMissing(true);
@@ -155,7 +152,6 @@ function ShowLists() {
           sx={{
             width: "100%",
             borderColor: "grey",
-            input: { color: "white" },
             Label: { color: "#c0c0c0" },
           }}
           onChange={(e) => searchValue(e.target.value)}
@@ -168,7 +164,6 @@ function ShowLists() {
             <Typography ml={2}>Favorite</Typography>
             <List>
               {favouriteList?.map((favItem) => {
-                if (favItem.id !== 0) {
                   return (
                     <React.Fragment key={favItem.id}>
                       <ListItem>
@@ -190,7 +185,6 @@ function ShowLists() {
                       </ListItem>
                     </React.Fragment>
                   );
-                }
               })}
             </List>
           </Grid>
@@ -212,7 +206,7 @@ function ShowLists() {
                 <Link
                   key={thedata.id}
                   component={RouterLink}
-                  to={"/input-contact/" + thedata.id}
+                  to={"/edit-contact/" + thedata.id}
                   underline="none"
                   color="black"
                 >

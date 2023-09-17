@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { 
   ApolloClient, 
@@ -9,7 +8,7 @@ import {
   from,
   NormalizedCacheObject
 } from '@apollo/client'
-import { persistCache, LocalStorageWrapper, CachePersistor } from 'apollo3-cache-persist';
+import { persistCache, LocalStorageWrapper } from 'apollo3-cache-persist';
 import {onError} from '@apollo/client/link/error'
 import ShowLists from "./Components/GetContactLists" 
 import InputContactForm from './Components/InputContact';
@@ -35,9 +34,6 @@ const cache = new InMemoryCache();
 
 function App() {
   const [client, setClient] = useState<ApolloClient<NormalizedCacheObject>>();
-  // const [persistor, setPersistor] = useState<
-  //   CachePersistor<NormalizedCacheObject>
-  // >();
 
   useEffect(() => {
     async function init() {
@@ -67,7 +63,7 @@ function App() {
       <Routes>
         <Route path="/" element={<ShowLists />} />
         <Route path="/input-contact" element={<InputContactForm />} />
-        <Route path="/input-contact/:id" element={<InputContactForm />} />
+        <Route path="/edit-contact/:id" element={<InputContactForm />} />
       </Routes>
   </ApolloProvider>
   )

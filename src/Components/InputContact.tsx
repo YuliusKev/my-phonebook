@@ -5,9 +5,7 @@ import {
   TextField,
   Alert,
   FormControl,
-  InputAdornment,
   IconButton,
-  OutlinedInput,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useEffect, useState } from "react";
@@ -15,7 +13,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { LOAD_CONTACT_LISTS } from "../GraphQL/Queries.tsx";
 import { ADD_CONTACT, EDIT_CONTACT } from "../GraphQL/Mutations.tsx";
 import { Grid } from "@mui/material";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function InputContactForm() {
   const navigate = useNavigate();
@@ -37,11 +35,8 @@ function InputContactForm() {
     }>;
   }>(LOAD_CONTACT_LISTS);
 
-  const [phoneCounter, setPhoneCounter] = useState<number>(1);
-
   const checkNameCharacters = (value: string, type: string) => {
-    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-    const phoneNumberChar = "0123456789";
+    const specialChars = /[`!@#$%^&*()_+\-=\]{};':"\\|,.<>?~]/;
 
     if (!specialChars.test(value)) {
       type === "first_name" ? setFirstName(value) : setLastName(value);
@@ -85,8 +80,6 @@ function InputContactForm() {
     }
 
     if (params.id) {
-      console.log(firstName);
-
       try {
         await EditContactById({
           variables: {
@@ -131,17 +124,22 @@ function InputContactForm() {
     }
   };
 
-  useEffect(() => {
-    const contact = contactList?.contact.find(
-      (contact) => contact.id.toString() === params.id
-    );
 
-    if (contact) {
-      setFirstName(contact.first_name);
-      setLastName(contact.last_name);
-      setListPhone(contact.phones);
-    }
-  }, [contactList?.contact]);
+    useEffect(() => {
+      if(params.id) {
+        const contact = contactList?.contact.find(
+          (contact) => contact.id.toString() === params.id
+        );
+    
+        if (contact) {
+          setFirstName(contact.first_name);
+          setLastName(contact.last_name);
+          setListPhone(contact.phones);
+        }
+      }
+      
+    }, [contactList?.contact]);
+  
 
   const deleteContact = (index : number) => {
     if(listPhone.length >1 ){
