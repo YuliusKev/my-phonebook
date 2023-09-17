@@ -16,12 +16,16 @@ import {
   TextField,
   ListItemIcon,
   IconButton,
+  Card,
+  CardContent,
+  Typography,
+  Link
 } from "@mui/material";
 import InfiniteScroll from "react-infinite-scroll-component";
 import StarIcon from "@mui/icons-material/Star";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useLocalStorageState } from "ahooks";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 
 function ShowLists() {
   window.onbeforeunload = function () {
@@ -125,15 +129,16 @@ function ShowLists() {
   function onBottomPage() {
     fetchMore({
       variables: {
-        limit: data.contact.length + 10,
-        offset: data.contact.length,
+        limit: 10,
+        offset: Math.ceil(data.contact.length / 10) * 10,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult) {
+        if (fetchMoreResult.contact.length === 0) {
           return prev;
         }
+        
         return {
-          contact: [...prev.contact, ...(fetchMoreResult?.contact || 0)],
+          contact: [...prev.contact, ...fetchMoreResult.contact],
         };
       },
     });
@@ -183,7 +188,9 @@ function ShowLists() {
           })}
         </List>
       </Grid>
+
       <Divider sx={{ bgcolor: "white" }} />
+
       <Grid sx={{ bgcolor: "#1e1e1e" }}>
         <InfiniteScroll
           dataLength={list.length}
@@ -194,7 +201,7 @@ function ShowLists() {
           <List sx={{ bgcolor: "#1e1e1e" }}>
             {list.map((thedata) => {
               return (
-                <Link key={thedata.id} to={"/input-contact/" + thedata.id}>
+                <Link key={thedata.id} component={RouterLink} to={"/input-contact/" + thedata.id} underline="none">
                   <ListItem>
                     <ListItemButton onClick={() => console.log(thedata.id)}>
                       <ListItemAvatar>
@@ -224,17 +231,16 @@ function ShowLists() {
                           }}
                         />
                       </IconButton>
-                      <IconButton
+                      {!isFavorite(thedata.id) && <IconButton
                         onClick={(e) => {
                           e.preventDefault();
                           onClickdelete(thedata.id);
                         }}
                       >
                         <DeleteIcon sx={{ color: "white" }} />
-                      </IconButton>
+                      </IconButton>}
                     </ListItemIcon>
                   </ListItem>
-                  <Divider sx={{ bgcolor: "white" }} />
                 </Link>
               );
             })}

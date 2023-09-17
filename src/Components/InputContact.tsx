@@ -1,5 +1,15 @@
 /** @jsxImportSource @emotion/react */
-import { Button, FormGroup, TextField, Alert } from "@mui/material";
+import {
+  Button,
+  FormGroup,
+  TextField,
+  Alert,
+  FormControl,
+  InputAdornment,
+  IconButton,
+  OutlinedInput,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { LOAD_CONTACT_LISTS } from "../GraphQL/Queries.tsx";
@@ -31,6 +41,8 @@ function InputContactForm() {
 
   const checkNameCharacters = (value: string, type: string) => {
     const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    const phoneNumberChar = "0123456789";
+
     if (!specialChars.test(value)) {
       type === "first_name" ? setFirstName(value) : setLastName(value);
     } else {
@@ -76,7 +88,6 @@ function InputContactForm() {
       console.log(firstName);
 
       try {
-        
         await EditContactById({
           variables: {
             id: params.id,
@@ -111,11 +122,13 @@ function InputContactForm() {
   };
 
   const valuePhoneNumber = (index: number, phoneNumber: string) => {
-    setListPhone((prevPhone) => {
-      const copyPhone = [...prevPhone];
-      copyPhone[index].number = phoneNumber;
-      return copyPhone;
-    });
+    if (/^\+?\d*$/gi.test(phoneNumber)) {
+      setListPhone((prevPhone) => {
+        const newPhoneList = [...prevPhone];
+        newPhoneList[index].number = phoneNumber;
+        return newPhoneList;
+      });
+    }
   };
 
   useEffect(() => {
@@ -130,13 +143,22 @@ function InputContactForm() {
     }
   }, [contactList?.contact]);
 
+  const deleteContact = (index : number) => {
+    if(listPhone.length >1 ){
+        setListPhone(list => {
+            const tempList = list.slice()
+            tempList.splice(index, 1)
+            return tempList
+        })
+    }
+  };
+
   return (
     <Grid>
       {contactExist && <Alert severity="error">Contact already exist!</Alert>}
 
       <FormGroup sx={{ paddingTop: 2 }}>
         <TextField
-          error={nameError ? true : false}
           label="Nama Depan"
           variant="outlined"
           value={firstName}
@@ -150,26 +172,36 @@ function InputContactForm() {
           onChange={(e) => checkNameCharacters(e.target.value, "last_name")}
           sx={{ margin: "5px" }}
         />
-        {listPhone.map((value, index) => {
-          return (
-            <TextField
-              key={index}
-              inputProps={{ type: "number" }}
-              label="Nomor Telepon"
-              variant="outlined"
-              value={value.number}
-              onChange={(e) => valuePhoneNumber(index, e.target.value)}
-              sx={{ margin: "5px" }}
-            />
-          );
-        })}
-        <Button
-          variant="outlined"
-          sx={{ margin: "5px" }}
-          onClick={() => addPhone()}
-        >
-          Tambah Nomor Telepon
-        </Button>
+        {!params.id &&
+          listPhone.map((value, index) => {
+            return (
+              <FormControl key={index} variant="outlined">
+                <TextField
+                  label="Nomor Telepon"
+                  variant="outlined"
+                  value={value.number}
+                  onChange={(e) => valuePhoneNumber(index, e.target.value)}
+                  sx={{ margin: "5px" }}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton  key={index} onClick={(id) => deleteContact(index)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    ),
+                  }}
+                />
+              </FormControl>
+            );
+          })}
+        {!params.id && (
+          <Button
+            variant="outlined"
+            sx={{ margin: "5px" }}
+            onClick={() => addPhone()}
+          >
+            Tambah Nomor Telepon
+          </Button>
+        )}
         <Button
           variant="contained"
           sx={{ margin: "5px" }}
