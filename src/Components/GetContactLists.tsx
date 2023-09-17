@@ -19,7 +19,7 @@ import {
   Card,
   CardContent,
   Typography,
-  Link
+  Link,
 } from "@mui/material";
 import InfiniteScroll from "react-infinite-scroll-component";
 import StarIcon from "@mui/icons-material/Star";
@@ -82,10 +82,11 @@ function ShowLists() {
   };
 
   const addFavorite = (data: any) => {
-    setFavouriteList([...(favouriteList ?? []), data])
-  }
+    setFavouriteList([...(favouriteList ?? []), data]);
+  };
 
-  const isFavorite = (id: number) => favouriteList?.some(list => list.id === id)
+  const isFavorite = (id: number) =>
+    favouriteList?.some((list) => list.id === id);
 
   const removeFavorite = (id: number) => {
     const favoriteIndex =
@@ -136,7 +137,7 @@ function ShowLists() {
         if (fetchMoreResult.contact.length === 0) {
           return prev;
         }
-        
+
         return {
           contact: [...prev.contact, ...fetchMoreResult.contact],
         };
@@ -145,7 +146,7 @@ function ShowLists() {
   }
 
   return (
-    <Grid sx={{ height: "100vh", bgcolor: "#1e1e1e" }}>
+    <Grid sx={{ height: "100vh" }}>
       <Box sx={{ padding: 2 }}>
         <TextField
           label="Search Contact"
@@ -160,87 +161,104 @@ function ShowLists() {
           onChange={(e) => searchValue(e.target.value)}
         />
       </Box>
-      <Grid sx={{ marginTop: 2, display: missing ? "none" : "block" }}>
-        <List sx={{ bgcolor: "#1e1e1e" }}>
-          {favouriteList?.map((favItem) => {
-            if (favItem.id !== 0) {
-              return (
-                <React.Fragment key={favItem.id}>
-                  <ListItem>
-                    <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: "aqua" }}>
-                        <PersonOutlineIcon sx={{ color: "white" }} />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={`${favItem.first_name} ${favItem.last_name} - ${favItem?.phones[0]?.number}`}
-                      sx={{ color: "white" }}
-                    ></ListItemText>
-                    <ListItemIcon sx={{ justifyContent: "right" }}>
-                      <IconButton onClick={() => removeFavorite(favItem.id)}>
-                        <StarIcon sx={{ color: "yellow" }} />
-                      </IconButton>
-                    </ListItemIcon>
-                  </ListItem>
-                </React.Fragment>
-              );
-            }
-          })}
-        </List>
-      </Grid>
 
-      <Divider sx={{ bgcolor: "white" }} />
+      {(favouriteList?.length ?? 0) > 0 && (
+        <>
+          <Grid sx={{ display: missing ? "none" : "block" }}>
+            <Typography ml={2}>Favorite</Typography>
+            <List>
+              {favouriteList?.map((favItem) => {
+                if (favItem.id !== 0) {
+                  return (
+                    <React.Fragment key={favItem.id}>
+                      <ListItem>
+                        <ListItemAvatar>
+                          <Avatar>
+                            <PersonOutlineIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={`${favItem.first_name} ${favItem.last_name} - ${favItem?.phones[0]?.number}`}
+                        ></ListItemText>
+                        <ListItemIcon sx={{ justifyContent: "right" }}>
+                          <IconButton
+                            onClick={() => removeFavorite(favItem.id)}
+                          >
+                            <StarIcon sx={{ color: "yellow" }} />
+                          </IconButton>
+                        </ListItemIcon>
+                      </ListItem>
+                    </React.Fragment>
+                  );
+                }
+              })}
+            </List>
+          </Grid>
 
-      <Grid sx={{ bgcolor: "#1e1e1e" }}>
+          <Divider />
+        </>
+      )}
+
+      <Grid>
         <InfiniteScroll
           dataLength={list.length}
           next={() => onBottomPage()}
           hasMore={true}
           loader={""}
         >
-          <List sx={{ bgcolor: "#1e1e1e" }}>
+          <List>
             {list.map((thedata) => {
               return (
-                <Link key={thedata.id} component={RouterLink} to={"/input-contact/" + thedata.id} underline="none">
-                  <ListItem>
-                    <ListItemButton onClick={() => console.log(thedata.id)}>
+                <Link
+                  key={thedata.id}
+                  component={RouterLink}
+                  to={"/input-contact/" + thedata.id}
+                  underline="none"
+                  color="black"
+                >
+                  <Box sx={{ boxShadow: 3, margin: 1, borderRadius: 3 }}>
+                    <ListItem>
                       <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: "aqua" }}>
-                          <PersonOutlineIcon sx={{ color: "white" }} />
+                        <Avatar>
+                          <PersonOutlineIcon />
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
                         primary={`${thedata?.first_name || ""} ${
                           thedata?.last_name || ""
                         } - ${thedata?.phones[0]?.number || ""}`}
-                        sx={{ color: "white" }}
                       ></ListItemText>
-                    </ListItemButton>
-                    <ListItemIcon sx={{ justifyContent: "right" }}>
-                      <IconButton
-                        onClick={(e) => {
-                          e.preventDefault();
-                          isFavorite(thedata.id) ? removeFavorite(thedata.id) : addFavorite(thedata);
-                        }}
-                      >
-                        <StarIcon
-                          sx={{
-                            color: isFavorite(thedata.id)
-                              ? "yellow"
-                              : "white",
+
+                      <ListItemIcon sx={{ justifyContent: "right" }}>
+                        <IconButton
+                          onClick={(e) => {
+                            e.preventDefault();
+                            isFavorite(thedata.id)
+                              ? removeFavorite(thedata.id)
+                              : addFavorite(thedata);
                           }}
-                        />
-                      </IconButton>
-                      {!isFavorite(thedata.id) && <IconButton
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onClickdelete(thedata.id);
-                        }}
-                      >
-                        <DeleteIcon sx={{ color: "white" }} />
-                      </IconButton>}
-                    </ListItemIcon>
-                  </ListItem>
+                        >
+                          <StarIcon
+                            sx={{
+                              color: isFavorite(thedata.id)
+                                ? "yellow"
+                                : undefined,
+                            }}
+                          />
+                        </IconButton>
+                        {!isFavorite(thedata.id) && (
+                          <IconButton
+                            onClick={(e) => {
+                              e.preventDefault();
+                              onClickdelete(thedata.id);
+                            }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        )}
+                      </ListItemIcon>
+                    </ListItem>
+                  </Box>
                 </Link>
               );
             })}
