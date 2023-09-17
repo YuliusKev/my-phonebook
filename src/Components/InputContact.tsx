@@ -22,7 +22,7 @@ function InputContactForm() {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [listPhone, setListPhone] = useState([{ number: "" }]);
-  const [nameError, setNameError] = useState<boolean>(false);
+  const [nameError, setNameError] = useState<string>("");
   const [contactExist, setContactExist] = useState(false);
 
   const { data: contactList } = useQuery<{
@@ -40,9 +40,7 @@ function InputContactForm() {
 
     if (!specialChars.test(value)) {
       type === "first_name" ? setFirstName(value) : setLastName(value);
-    } else {
-      setNameError(true);
-    }
+    } 
   };
 
   const [addContactWithPhones] = useMutation(ADD_CONTACT);
@@ -51,8 +49,15 @@ function InputContactForm() {
   const addContact = async () => {
     let invalid = false;
 
-    if (firstName === lastName) {
-      setNameError(true);
+    if(firstName === "" || lastName === ""){
+      setContactExist(true);
+      invalid = true;
+      setNameError("Name Field cant be empty");
+      return;
+    } else if(firstName === lastName) {
+      setContactExist(true);
+      invalid = true;
+      setNameError("Name must be Unique");
 
       return;
     }
@@ -153,7 +158,7 @@ function InputContactForm() {
 
   return (
     <Grid>
-      {contactExist && <Alert severity="error">Contact already exist!</Alert>}
+      {contactExist && <Alert severity="error">{nameError}</Alert>}
 
       <FormGroup sx={{ paddingTop: 2 }}>
         <TextField
