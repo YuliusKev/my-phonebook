@@ -73,7 +73,7 @@ function InputContactForm() {
         )
       ) {
         setContactExist(true);
-
+        setNameError("Name already Exist in contact lists");
         invalid = true;
 
         break;
