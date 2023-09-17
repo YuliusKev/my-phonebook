@@ -180,7 +180,7 @@ function ShowLists() {
                           <IconButton
                             onClick={() => removeFavorite(favItem.id)}
                           >
-                            <StarIcon sx={{ color: "yellow" }} />
+                            <StarIcon sx={{ color: "#FC6A03" }} />
                           </IconButton>
                         </ListItemIcon>
                       </ListItem>
@@ -236,7 +236,7 @@ function ShowLists() {
                           <StarIcon
                             sx={{
                               color: isFavorite(thedata.id)
-                                ? "yellow"
+                                ? "#FC6A03"
                                 : undefined,
                             }}
                           />
