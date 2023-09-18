@@ -57,12 +57,9 @@ function ShowLists() {
     },
   };
 
-  const { data, refetch, fetchMore } = useQuery(
-    LOAD_CONTACT_LISTS,
-    {
-      variables: firstFetch,
-    }
-  );
+  const { data, refetch, fetchMore } = useQuery(LOAD_CONTACT_LISTS, {
+    variables: firstFetch,
+  });
 
   useEffect(() => {
     if (data) {
@@ -73,8 +70,19 @@ function ShowLists() {
   const [deleteContactData, { error: deleteError }] =
     useMutation(DELETE_CONTACT);
 
-  const refetchList = async () => {
-    const listData = refetch();
+  const refetchList = async (name:string) => {
+
+    let validation = {}
+    if(name) {
+      validation = { where: { first_name: { _ilike: `%${name}%` } } }
+    } else {
+      validation = {
+        where: {
+          _and: { id: { _nin: favouriteList?.map((list) => list.id) } },
+        }
+      }
+    }
+    const listData = refetch(validation);
     setList((await listData).data.contact);
   };
 
@@ -110,18 +118,19 @@ function ShowLists() {
     if (deleteError) {
       return <h1>ERROR</h1>;
     } else {
-      refetchList();
+      refetchList('');
     }
   };
 
   const searchValue = (value: string) => {
     setSearch(value);
-    refetch({ where: { first_name: { _ilike: `%${value}%` } } });
     if (value === "") {
       setMissing(false);
     } else {
       setMissing(true);
     }
+    refetchList(value);
+
   };
 
   function onBottomPage() {
@@ -164,27 +173,25 @@ function ShowLists() {
             <Typography ml={2}>Favorite</Typography>
             <List>
               {favouriteList?.map((favItem) => {
-                  return (
-                    <React.Fragment key={favItem.id}>
-                      <ListItem>
-                        <ListItemAvatar>
-                          <Avatar>
-                            <PersonOutlineIcon />
-                          </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText
-                          primary={`${favItem.first_name} ${favItem.last_name} - ${favItem?.phones[0]?.number}`}
-                        ></ListItemText>
-                        <ListItemIcon sx={{ justifyContent: "right" }}>
-                          <IconButton
-                            onClick={() => removeFavorite(favItem.id)}
-                          >
-                            <StarIcon sx={{ color: "#FC6A03" }} />
-                          </IconButton>
-                        </ListItemIcon>
-                      </ListItem>
-                    </React.Fragment>
-                  );
+                return (
+                  <React.Fragment key={favItem.id}>
+                    <ListItem>
+                      <ListItemAvatar>
+                        <Avatar>
+                          <PersonOutlineIcon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={`${favItem.first_name} ${favItem.last_name} - ${favItem?.phones[0]?.number}`}
+                      ></ListItemText>
+                      <ListItemIcon sx={{ justifyContent: "right" }}>
+                        <IconButton onClick={() => removeFavorite(favItem.id)}>
+                          <StarIcon sx={{ color: "#FC6A03" }} />
+                        </IconButton>
+                      </ListItemIcon>
+                    </ListItem>
+                  </React.Fragment>
+                );
               })}
             </List>
           </Grid>
